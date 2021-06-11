@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script src="../js/jquery-3.6.0.min.js"></script>
+        <link rel="stylesheet" href="../css/bootstrap.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
+    </head>
+
+    <script>
+
+        async function getListe(trier_par, valeur){
+
+            let partie_get = "";
+
+            if(trier_par == "id_artiste" && valeur != "" && valeur != null){
+                partie_get = "?id_artiste="+valeur;
+            }if(trier_par == "id_theme" && valeur != "" && valeur != null){
+                partie_get = "?id_theme="+valeur;
+            }
+
+            let objet_resultat = null;
+
+            let myHeaders = new Headers();
+            myHeaders.append("token", Cookies.get("token"));
+            myHeaders.append("Access-Control-Allow-Origin", "*");
+
+            let myInit = { method: 'GET',
+            headers: myHeaders,
+            mode: 'cors',
+            cache: 'default' };
+
+            try {
+                await fetch("http://localhost:8081/api/jeux_images"+partie_get, myInit)
+                .then(r => r.json().then(data => ({status: r.status, body: data})))
+                .then(obj => objet_resultat = obj);
+            } catch (error) {
+                console.log(error);
+            }
+
+            let liste = document.getElementById("liste");
+
+            if(objet_resultat !== undefined){
+                console.log(objet_resultat.body);
+                for(let i = 0; i < objet_resultat.body.length; i++){
+                    let child = document.createElement("p");
+                    child.classList.add("font-weight-bold");
+                    child.classList.add("pt-2");
+                    child.innerText = "Nom : '" + objet_resultat.body[i].nom_jeu_image + "' / artiste : '" + objet_resultat.body[i].id_artiste + "' / thème : '" + objet_resultat.body[i].id_theme + "' / url d'usage : '" + objet_resultat.body[i].url_usage + "'" ;
+
+                    liste.appendChild(child);
+                }
+            }else{
+                let child = document.createElement("p");
+                child.classList.add("font-weight-bold");
+                child.classList.add("pt-2");
+                child.innerText = "La récupération de la liste a échouée";
+
+                liste.appendChild(child);
+            }
+
+        }
+
+        function redirectConnexion(){
+            document.getElementById("checkmark_a").click();
+        }
+
+        function deconnexion(event){
+            event.preventDefault();
+            Cookies.remove("token");
+            document.getElementById("redirection_connexion").click();
+        }
+
+    </script>
+
+    <body>
+
+        <!-- navbar -->
+        <nav class="navbar navbar-expand-lg justify-content-center border-bottom" style="background-color: darkslategray;">
+            <div class="navbar-center">
+                <ul class="nav">
+
+                    <li class="nav-item d-none" id="inscription">
+                        <a class="nav-link text-uppercase text-white pr-4" href="/interface_API/inscription.html">Inscription</a>
+                    </li>
+                    <li class="nav-item d-none" id="connexion">
+                        <a class="nav-link text-uppercase text-white pr-4" id="redirection_connexion" href="/interface_API/connexion.html">connexion</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link text-uppercase text-white pr-4" href="/interface_API/themes.html">thèmes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-uppercase text-white pr-4" href="/interface_API/artistes.html">artistes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-uppercase text-white pr-4" href="/interface_API/jeux_images.html">jeux images</a>
+                    </li>
+
+                    <li class="nav-item" id="deconnexion">
+                        <a class="nav-link text-uppercase text-white pr-4" href="#" onclick="deconnexion(event)">déconnexion</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <!-- navbar -->
+
+        <div id="echec_ajout" class="alert alert-danger mb-0 text-center" style="display:none;">
+            L'action a échouée.
+        </div>
+
+        <div>
+
+            <!-- card -->
+            <div class="container card mt-5 pl-0 pt-0 pr-0 pb-3 w-50">
+
+                <h4 class="card-header text-center"> Jeux images </h4>
+
+                <!-- ajout d'un theme -->
+                <!-- <button class="btn btn-secondary" onclick="ajouteTheme()">Ajouter un thème</button> -->
+                <!-- ajout d'un theme -->
+
+                <!-- liste des themes -->
+                <div id="liste" class="pl-4 pt-2 pr-4 text-center">
+                </div>
+                <!-- liste des themes -->
+
+            </div>
+            <!-- card -->
+
+        </div>
+    </body>
+
+    <script>
+        if(Cookies.get("token") == undefined){
+            document.getElementById("redirection_connexion").click();
+        }
+        getListe();
+    </script>
+</html>

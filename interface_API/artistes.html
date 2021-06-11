@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script src="../js/jquery-3.6.0.min.js"></script>
+        <link rel="stylesheet" href="../css/bootstrap.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
+    </head>
+
+    <script>
+
+        async function getListe(){
+
+            let objet_resultat = null;
+
+            let myHeaders = new Headers();
+            myHeaders.append("token", Cookies.get("token"));
+            myHeaders.append("Access-Control-Allow-Origin", "*");
+
+            let myInit = { method: 'GET',
+            headers: myHeaders,
+            mode: 'cors',
+            cache: 'default' };
+
+            try {
+                await fetch("http://localhost:8081/api/artistes", myInit)
+                .then(r => r.json().then(data => ({status: r.status, body: data})))
+                .then(obj => objet_resultat = obj);
+            } catch (error) {
+                console.log(error);
+            }
+
+            let liste = document.getElementById("liste");
+
+            if(objet_resultat !== undefined){
+                for(let i = 0; i < objet_resultat.body.length; i++){
+                    let child = document.createElement("p");
+                    child.classList.add("font-weight-bold");
+                    child.classList.add("pt-2");
+                    child.innerText = objet_resultat.body[i].nom_artiste;
+
+                    let child_button_update = document.createElement("button");
+                    child_button_update.classList.add("ml-3");
+                    child_button_update.classList.add("btn");
+                    child_button_update.classList.add("btn-primary");
+                    child_button_update.value = objet_resultat.body[i].id_artiste;
+                    child_button_update.innerText = "modifier";
+                    child_button_update.setAttribute("original_name", objet_resultat.body[i].nom_artiste);
+                    child_button_update.setAttribute("onclick", "updateArtiste(event)");
+                    child.appendChild(child_button_update);
+
+                    let child_button_delete = document.createElement("button");
+                    child_button_delete.classList.add("ml-3");
+                    child_button_delete.classList.add("btn");
+                    child_button_delete.classList.add("btn-danger");
+                    child_button_delete.value = objet_resultat.body[i].id_artiste;
+                    child_button_delete.innerText = "supprimer";
+                    child_button_delete.setAttribute("onclick", "deleteArtiste(event)");
+                    child.appendChild(child_button_delete);
+
+                    liste.appendChild(child);
+                }
+            }else{
+                let child = document.createElement("p");
+                child.classList.add("font-weight-bold");
+                child.classList.add("pt-2");
+                child.innerText = "La récupération de la liste a échouée";
+
+                liste.appendChild(child);
+            }
+
+
+        }
+
+        function ajouteArtiste(){
+
+            let nom_artiste = prompt("ajouter un artiste");
+
+            let success = false;
+
+            if(nom_artiste != null && nom_artiste != ""){
+                let formData = new FormData();
+
+                formData.append("nom_artiste", nom_artiste);
+
+                const data = new URLSearchParams();
+                for (const pair of formData) {
+                    data.append(pair[0], pair[1]);
+                }
+
+                let myHeaders = new Headers();
+                myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+                myHeaders.append("token", Cookies.get("token"));
+                myHeaders.append("Access-Control-Allow-Origin", "*");
+
+                let myInit = { method: 'POST',
+                headers: myHeaders,
+                mode: 'cors',
+                body: data,
+                cache: 'default' };
+
+                fetch("http://localhost:8081/api/artistes", myInit)
+                .then(function(response) {
+                    if(response.status == 200){
+                        successVisual();
+                    }else{
+                        failVisual();
+                    }
+                    return response.blob;
+                })
+                .then(function(myBlob) {
+                    console.log(myBlob);
+                });
+
+            }
+
+        }
+
+        function updateArtiste(event){
+
+            let nom_artiste = event.target.getAttribute("original_name");
+            let new_nom_artiste = prompt("modifier un artiste", nom_artiste);
+
+            let success = false;
+
+            if(new_nom_artiste != "null" && new_nom_artiste != nom_artiste){
+
+                let myHeaders = new Headers();
+                myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+                myHeaders.append("token", Cookies.get("token"));
+                myHeaders.append("Access-Control-Allow-Origin", "*");
+
+                let myInit = { method: 'PUT',
+                headers: myHeaders,
+                mode: 'cors',
+                cache: 'default' };
+
+                fetch("http://localhost:8081/api/artistes/"+event.target.value+"/"+new_nom_artiste, myInit)
+                .then(function(response) {
+                    if(response.status == 200){
+                        successVisual();
+                    }else{
+                        failVisual();
+                    }
+                    return response.blob;
+                })
+                .then(function(myBlob) {
+                    console.log(myBlob);
+                });
+
+            }
+
+        }
+
+        function deleteArtiste(event){
+
+            if(confirm("supprimer cet artiste?")){
+
+                let myHeaders = new Headers();
+                myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+                myHeaders.append("token", Cookies.get("token"));
+                myHeaders.append("Access-Control-Allow-Origin", "*");
+
+                let myInit = { method: 'DELETE',
+                headers: myHeaders,
+                mode: 'cors',
+                cache: 'default' };
+
+                fetch("http://localhost:8081/api/artistes/"+event.target.value, myInit)
+                .then(function(response) {
+                    if(response.status == 200){
+                        successVisual();
+                    }else{
+                        failVisual();
+                    }
+                    return response.blob;
+                })
+                .then(function(myBlob) {
+                    console.log(myBlob);
+                });
+
+            }
+
+        }
+
+        function successVisual(){
+
+            let echec_ajout = document.getElementById("echec_ajout");
+            echec_ajout.setAttribute("style","display:none;");
+
+            let liste = document.getElementById("liste");
+            liste.innerHTML = "";
+
+            getListe();
+
+        }
+
+        function failVisual(){
+
+            let echec_ajout = document.getElementById("echec_ajout");
+            echec_ajout.removeAttribute("style");
+
+        }
+
+        function redirectConnexion(){
+            document.getElementById("checkmark_a").click();
+        }
+
+        function deconnexion(event){
+            event.preventDefault();
+            Cookies.remove("token");
+            document.getElementById("redirection_connexion").click();
+        }
+
+    </script>
+
+    <body>
+
+        <!-- navbar -->
+        <nav class="navbar navbar-expand-lg justify-content-center border-bottom" style="background-color: darkslategray;">
+            <div class="navbar-center">
+                <ul class="nav">
+
+                    <li class="nav-item d-none" id="inscription">
+                        <a class="nav-link text-uppercase text-white pr-4" href="/interface_API/inscription.html">Inscription</a>
+                    </li>
+                    <li class="nav-item d-none" id="connexion">
+                        <a class="nav-link text-uppercase text-white pr-4" id="redirection_connexion" href="/interface_API/connexion.html">connexion</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link text-uppercase text-white pr-4" href="/interface_API/themes.html">thèmes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-uppercase text-white pr-4" href="/interface_API/artistes.html">artistes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-uppercase text-white pr-4" href="/interface_API/jeux_images.html">jeux images</a>
+                    </li>
+
+                    <li class="nav-item" id="deconnexion">
+                        <a class="nav-link text-uppercase text-white pr-4" href="#" onclick="deconnexion(event)">déconnexion</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <!-- navbar -->
+
+        <div id="echec_ajout" class="alert alert-danger mb-0 text-center" style="display:none;">
+            L'action a échouée.
+        </div>
+
+        <div>
+
+            <!-- card -->
+            <div class="container card mt-5 pl-0 pt-0 pr-0 pb-3 w-50">
+
+                <h4 class="card-header text-center"> Artiste </h4>
+
+                <!-- ajout d'un artiste -->
+                <button class="btn btn-secondary" onclick="ajouteArtiste()">Ajouter un artiste</button>
+                <!-- ajout d'un artiste -->
+
+                <!-- liste des artistes -->
+                <div id="liste" class="pl-4 pt-2 pr-4 text-center">
+                </div>
+                <!-- liste des artistes -->
+
+            </div>
+            <!-- card -->
+
+        </div>
+    </body>
+
+    <script>
+        if(Cookies.get("token") == undefined){
+            document.getElementById("redirection_connexion").click();
+        }
+        getListe();
+    </script>
+</html>

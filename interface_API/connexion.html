@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script src="../js/jquery-3.6.0.min.js"></script>
+        <link rel="stylesheet" href="../css/bootstrap.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
+    </head>
+
+    <script>
+
+        async function connexion(event){
+            event.preventDefault();
+
+            let identifiant = document.getElementById("identifiant").value;
+            let mot_de_passe = document.getElementById("mot_de_passe").value;
+
+            let objet_resultat = null;
+
+            if(identifiant != "" && mot_de_passe != ""){
+
+                let myHeaders = new Headers();
+
+                let myInit = { method: 'GET',
+                headers: myHeaders,
+                mode: 'cors',
+                cache: 'default' };
+
+                try {
+                    await fetch("http://localhost:8081/api/utilisateurs/"+identifiant+"/"+mot_de_passe, myInit)
+                    .then(r => r.json().then(data => ({status: r.status, body: data})))
+                    .then(obj => objet_resultat = obj);
+                } catch (error) {
+                    console.log(error);
+                }
+
+                if(objet_resultat !== undefined){
+                    if(objet_resultat.body.token != ""){
+                        Cookies.set('token', objet_resultat.body.token);
+                        successVisual();
+                    }else{
+                        failVisual();
+                    }
+                }else{
+                    failVisual();
+                }
+
+            }
+
+        }
+
+        function successVisual(){
+
+            let formulaire_connexion = document.getElementById("formulaire_connexion");
+            formulaire_connexion.setAttribute("Style","display:none;");
+
+            let lien_page_inscription = document.getElementById("lien_page_inscription");
+            lien_page_inscription.setAttribute("Style","display:none;");
+
+            let checkmark = document.getElementById("checkmark");
+            checkmark.removeAttribute("Style");
+
+            setTimeout('redirectThemes()',5000);
+
+        }
+
+        function failVisual(){
+
+            let identifiant = document.getElementById("identifiant");
+            identifiant.classList.add("is-invalid");
+
+            let mot_de_passe = document.getElementById("mot_de_passe");
+            mot_de_passe.classList.add("is-invalid");
+        }
+
+        function redirectThemes(){
+            document.getElementById("checkmark_a").click();
+        }
+
+    </script>
+
+    <body>
+
+        <!-- navbar -->
+        <nav class="navbar navbar-expand-lg justify-content-center border-bottom" style="background-color: darkslategray;">
+            <div class="navbar-center">
+                <ul class="nav">
+
+                    <li class="nav-item" id="inscription">
+                        <a class="nav-link text-uppercase text-white pr-4" href="/interface_API/inscription.html">Inscription</a>
+                    </li>
+                    <li class="nav-item" id="connexion">
+                        <a class="nav-link text-uppercase text-white pr-4" href="/interface_API/connexion.html">connexion</a>
+                    </li>
+
+                    <li class="nav-item d-none">
+                        <a class="nav-link text-uppercase text-white pr-4" id="redirection_themes" href="/interface_API/themes.html">thèmes</a>
+                    </li>
+                    <li class="nav-item d-none">
+                        <a class="nav-link text-uppercase text-white pr-4" href="/interface_API/artistes.html">artistes</a>
+                    </li>
+                    <li class="nav-item d-none">
+                        <a class="nav-link text-uppercase text-white pr-4" href="/interface_API/jeux_images.html">jeux images</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <!-- navbar -->
+
+        <div>
+
+            <!-- card -->
+            <div class="container card mt-5 pl-0 pt-0 pr-0 pb-3 w-25">
+
+                <h4 class="card-header text-center"> Connexion </h4>
+
+                <!-- formulaire -->
+                <form id="formulaire_connexion" class="container pl-4 pt-2 pr-4">
+
+                    <div class="row form-group w-75 m-auto">
+                        <small class="mb-0 ml-2">identifiant :</small>
+                        <input type="text" id="identifiant" name="identifiant" class="form-control mb-3">
+                    </div>
+
+                    <div class="row form-group w-75 m-auto">
+                        <small class="mb-0 ml-2">mot de passe :</small>
+                        <input type="password" id="mot_de_passe" name="mot_de_passe" class="form-control mb-3">
+                    </div>
+
+                    <div class="row form-group w-75 m-auto">
+                        <button type="button" id="submitButton" onclick="connexion(event)" class="col btn btn-primary">connexion</button>
+                    </div>
+
+                </form>
+                <!-- formulaire -->
+
+                
+                <!-- check mark -->
+                <div class="container pl-4 pt-2 pr-4 text-center" id="checkmark" style="display: none;">
+                    <a href="/interface_API/themes.html" id="checkmark_a"><img src="../img/check.png" class="w-75"></a>
+                </div>
+                <!-- check mark -->
+
+
+                <!-- lien inscription -->
+                <small class="m-auto" id="lien_page_inscription">
+                    <a href="/interface_API/inscription.html">page d'inscription</a>
+                </small>
+                <!-- lien inscription -->
+
+            </div>
+            <!-- card -->
+
+        </div>
+    </body>
+
+    <script>
+        if(Cookies.get("token") != undefined){
+            document.getElementById("redirection_themes").click();
+        }
+    </script>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script src="js/jquery-3.6.0.min.js"></script>
+    </head>
+    <body>
+        <div>
+            <form action="http://localhost:8081/api/themes" method="post">
+                nom_theme : <input type="text" name="nom_theme" value="magie"><br>
+                <!--fichier zip : <input type="file" name="zipfile"><br>-->
+                <!--id_jeu_image : <input type="text" name="id_jeu_image" value="8"><br>-->
+                <!--set : <select id="set "name="set">
+                    <option value="neutres">neutres</option>
+                    <option value="singuliers">singuliers</option>
+                <select><br>-->
+                <input id="tokenField" type="hidden" value="880b6d4ce8476ee14a6949f187297515bc49c180"><br>
+                <button id="submitButton" type="button">submit</button>
+            </form>
+        </div>
+        <script>
+            // $('#submitButton').on('click',function( event ){
+
+            //     $.ajax({
+            //         url: "http://127.0.0.1:8081/api/themes",
+            //         type: 'POST',
+            //         data: formData,
+            //         contentType : 'application/json',
+            //         Origin : "localhost",
+            //         headers: {
+            //             "token": "880b6d4ce8476ee14a6949f187297515bc49c180",
+            //             "Access-Control-Allow-Origin": "*"
+            //         },
+            //         async: false
+            //     })
+            // });
+        </script>
+    </body>
+</html>

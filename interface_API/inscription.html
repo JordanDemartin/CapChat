@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script src="../js/jquery-3.6.0.min.js"></script>
+        <link rel="stylesheet" href="../css/bootstrap.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
+    </head>
+
+    <script>
+
+        function inscription(event){
+            event.preventDefault();
+
+            let identifiant = document.getElementById("identifiant").value;
+            let mot_de_passe = document.getElementById("mot_de_passe").value;
+
+            let success = false;
+
+            if(identifiant != "" && mot_de_passe != ""){
+                let formData = new FormData(document.getElementById("formulaire_inscription"));
+
+                const data = new URLSearchParams();
+                for (const pair of formData) {
+                    data.append(pair[0], pair[1]);
+                }
+
+                let myHeaders = new Headers();
+                myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+                let myInit = { method: 'POST',
+                headers: myHeaders,
+                mode: 'cors',
+                body: data,
+                cache: 'default' };
+
+                fetch("http://localhost:8081/api/utilisateurs", myInit)
+                .then(function(response) {
+                    console.log(response.body);
+                    if(response.status == 200){
+                        successVisual();
+                    }else{
+                        failVisual();
+                    }
+                    return response.blob;
+                })
+                .then(function(myBlob) {
+                    console.log(myBlob);
+                });
+
+            }
+
+        }
+
+        function successVisual(){
+
+            let formulaire_inscription = document.getElementById("formulaire_inscription");
+            formulaire_inscription.setAttribute("Style","display:none;");
+
+            let lien_page_connexion = document.getElementById("lien_page_connexion");
+            lien_page_connexion.setAttribute("Style","display:none;");
+
+            let checkmark = document.getElementById("checkmark");
+            checkmark.removeAttribute("Style");
+
+            setTimeout('redirectConnexion()',5000);
+
+        }
+
+        function failVisual(){
+
+            let identifiant = document.getElementById("identifiant");
+            identifiant.classList.add("is-invalid");
+
+            let mot_de_passe = document.getElementById("mot_de_passe");
+            mot_de_passe.classList.add("is-invalid");
+        }
+
+        function redirectConnexion(){
+            document.getElementById("checkmark_a").click();
+        }
+
+    </script>
+
+    <body>
+
+        <!-- navbar -->
+        <nav class="navbar navbar-expand-lg justify-content-center border-bottom" style="background-color: darkslategray;">
+            <div class="navbar-center">
+                <ul class="nav">
+
+                    <li class="nav-item" id="inscription">
+                        <a class="nav-link text-uppercase text-white pr-4" href="/interface_API/inscription.html">inscription</a>
+                    </li>
+                    <li class="nav-item" id="connexion">
+                        <a class="nav-link text-uppercase text-white pr-4" href="/interface_API/connexion.html">connexion</a>
+                    </li>
+
+                    <li class="nav-item d-none">
+                        <a class="nav-link text-uppercase text-white pr-4" id="redirection_themes" href="/interface_API/themes.html">thèmes</a>
+                    </li>
+                    <li class="nav-item d-none">
+                        <a class="nav-link text-uppercase text-white pr-4" href="/interface_API/artistes.html">artistes</a>
+                    </li>
+                    <li class="nav-item d-none">
+                        <a class="nav-link text-uppercase text-white pr-4" href="/interface_API/jeux_images.html">jeux images</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <!-- navbar -->
+
+        <div>
+
+            <!-- card -->
+            <div class="container card mt-5 pl-0 pt-0 pr-0 pb-3 w-25">
+
+                <h4 class="card-header text-center"> Inscription </h4>
+
+                <!-- formulaire -->
+                <form id="formulaire_inscription" class="container pl-4 pt-2 pr-4">
+
+                    <div class="row form-group w-75 m-auto">
+                        <small class="mb-0 ml-2">identifiant :</small>
+                        <input type="text" id="identifiant" name="identifiant" class="form-control mb-3">
+                    </div>
+
+                    <div class="row form-group w-75 m-auto">
+                        <small class="mb-0 ml-2">mot de passe :</small>
+                        <input type="password" id="mot_de_passe" name="mot_de_passe" class="form-control mb-3">
+                    </div>
+
+                    <div class="row form-group w-75 m-auto">
+                        <button type="button" id="submitButton" onclick="inscription(event)" class="col btn btn-primary">Inscription</button>
+                    </div>
+
+                </form>
+                <!-- formulaire -->
+
+                
+                <!-- check mark -->
+                <div class="container pl-4 pt-2 pr-4 text-center" id="checkmark" style="display: none;">
+                    <a href="/interface_API/connexion.html" id="checkmark_a"><img src="../img/check.png" class="w-75"></a>
+                </div>
+                <!-- check mark -->
+
+
+                <!-- lien connexion -->
+                <small class="m-auto" id="lien_page_connexion">
+                    <a class="" href="/interface_API/connexion.html">page de connexion</a>
+                </small>
+                <!-- lien connexion -->
+
+            </div>
+            <!-- card -->
+
+        </div>
+    </body>
+
+    <script>
+        if(Cookies.get("token") != undefined){
+            document.getElementById("redirection_themes").click();
+        }
+    </script>
+</html>

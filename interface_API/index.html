@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script src="../js/jquery-3.6.0.min.js"></script>
+        <link rel="stylesheet" href="../css/bootstrap.min.css">
+        <script src="../js/js.cookie.min.js"></script>
+    </head>
+    <body>
+        <a href="/interface_API/connexion.html" id="redirection_connexion">connexion</a>
+        <a href="/interface_API/themes.html" id="redirection_themes">themes</a>
+        <script>
+            if(Cookies.get("token") == undefined){
+                document.getElementById("redirection_connexion").click();
+            }else{
+                document.getElementById("redirection_themes").click();
+            }
+        </script>
+    </body>
+</html>

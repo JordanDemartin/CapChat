@@ -1,0 +1,36 @@
+body{
+    text-align : center;
+}
+
+#reload{
+    border-radius : 25px;
+}
+
+#horloge{
+    border-radius : 25px;
+}
+
+.capchat_image {
+    max-height : 40%;
+    margin: 1%;
+}
+
+.cadre-images {
+    background-color :#aaa;
+    padding : 1%;
+    margin: 1%;
+    border-radius : 25px;
+}
+
+.cadre-global {
+    display : flex;
+    width : fit-content;
+    background-color :#444;
+    padding : 1%;
+    border-radius : 25px;
+    max-height: 718px;
+}
+
+.bloc-horloge {
+    max-height : 718px;
+}
